@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroDiff - Calculadora de EDO de Primer Orden</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Math.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+    <!-- KaTeX JS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Animated Orbs -->
+    <div class="nebula-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="logo-area">
+                <div class="logo-glow"></div>
+                <i data-lucide="orbit" class="logo-icon"></i>
+                <h1>AstroDiff</h1>
+                <span class="badge badge-basic">BASIC</span>
+            </div>
+            <div class="subtitle">Calculadora Científica de Ecuaciones Diferenciales de Primer Orden</div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace-grid">
+            
+            <!-- Left Panel: Input & Settings -->
+            <section class="panel glass-card scrollable-panel">
+                <div class="panel-header">
+                    <i data-lucide="sliders" class="icon-accent"></i>
+                    <h2>Configuración de la Ecuación</h2>
+                </div>
+                
+                <!-- Select Method / Form -->
+                <div class="form-group">
+                    <label for="eq-type">Tipo de Ecuación Diferencial</label>
+                    <div class="custom-select-wrapper">
+                        <select id="eq-type">
+                            <option value="linear" selected>Lineal: y' + P(x)y = Q(x)</option>
+                            <option value="separable">Separable: y' = f(x) * g(y)</option>
+                            <option value="general">General (Campo de Direcciones): y' = f(x, y)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Equations inputs (Dynamic) -->
+                <div class="inputs-container">
+                    
+                    <!-- Linear EDO inputs -->
+                    <div id="inputs-linear" class="equation-inputs-group active">
+                        <div class="latex-preview-block" id="linear-latex-preview">
+                            y' + P(x)y = Q(x)
+                        </div>
+                        <div class="form-group">
+                            <label for="input-px">Función P(x)</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="input-px" class="formula-input" value="2" placeholder="Ej: 2, x, sin(x), 1/x">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-qx">Función Q(x)</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="input-qx" class="formula-input" value="x" placeholder="Ej: e^x, x^2, cos(x), 0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Separable EDO inputs -->
+                    <div id="inputs-separable" class="equation-inputs-group">
+                        <div class="latex-preview-block" id="separable-latex-preview">
+                            y' = f(x) \cdot g(y)
+                        </div>
+                        <div class="form-group">
+                            <label for="input-fx">Función f(x)</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="input-fx" class="formula-input" value="x" placeholder="Ej: x, sin(x), exp(x)">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-gy">Función g(y)</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="input-gy" class="formula-input" value="y" placeholder="Ej: y, y^2, cos(y), 1/y">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- General EDO inputs -->
+                    <div id="inputs-general" class="equation-inputs-group">
+                        <div class="latex-preview-block" id="general-latex-preview">
+                            y' = f(x, y)
+                        </div>
+                        <div class="form-group">
+                            <label for="input-fxy">Función f(x, y)</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="input-fxy" class="formula-input" value="x - y" placeholder="Ej: x - y, y/x, x*y^2">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Initial Conditions -->
+                <div class="section-divider">Condiciones Iniciales (Opcional)</div>
+                
+                <div class="initial-conditions-grid">
+                    <div class="form-group">
+                        <label for="input-x0">x₀</label>
+                        <div class="input-glow-wrapper">
+                            <input type="number" id="input-x0" step="any" value="0" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-y0">y(x₀)</label>
+                        <div class="input-glow-wrapper">
+                            <input type="number" id="input-y0" step="any" value="1" placeholder="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkbox-container">
+                    <label class="custom-checkbox">
+                        <input type="checkbox" id="toggle-ic" checked>
+                        <span class="checkmark"></span>
+                        Aplicar condición inicial
+                    </label>
+                </div>
+
+                <!-- Calculate Button -->
+                <button id="btn-calculate" class="btn btn-primary glowing-button">
+                    <i data-lucide="sparkles"></i>
+                    <span>Resolver y Graficar</span>
+                </button>
+
+            </section>
+
+            <!-- Right Panel: Visualization -->
+            <section class="panel glass-card visualizer-panel">
+                <div class="panel-header header-with-actions">
+                    <div class="header-title">
+                        <i data-lucide="line-chart" class="icon-accent"></i>
+                        <h2>Campo de Direcciones</h2>
+                    </div>
+                    <div class="visualizer-actions">
+                        <button id="btn-zoom-in" class="btn-icon" title="Acercar"><i data-lucide="zoom-in"></i></button>
+                        <button id="btn-zoom-out" class="btn-icon" title="Alejar"><i data-lucide="zoom-out"></i></button>
+                        <button id="btn-reset-view" class="btn-icon" title="Restablecer Vista"><i data-lucide="refresh-cw"></i></button>
+                        <button id="btn-clear-points" class="btn-icon danger" title="Limpiar Soluciones"><i data-lucide="trash-2"></i></button>
+                    </div>
+                </div>
+
+                <!-- Interactive canvas -->
+                <div class="canvas-container">
+                    <canvas id="slope-field-canvas"></canvas>
+                    <div class="canvas-hint">
+                        <i data-lucide="mouse-pointer-click"></i> Haz clic en el plano para definir y trazar una curva de solución particular
+                    </div>
+                    <div class="canvas-coords" id="coords-display">x: 0.00, y: 0.00</div>
+                </div>
+
+                <!-- Canvas Legend -->
+                <div class="canvas-legend">
+                    <span class="legend-item"><span class="color-dot arrow-dot"></span>Pendientes (Campo)</span>
+                    <span class="legend-item"><span class="color-dot solution-dot"></span>Solución Particular</span>
+                    <span class="legend-item"><span class="color-dot ic-dot"></span>Condición Inicial</span>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Solution Steps & Mathematical Breakdown -->
+        <section class="panel glass-card solution-details-panel">
+            <div class="panel-header">
+                <i data-lucide="book-open" class="icon-accent"></i>
+                <h2>Solución Analítica Paso a Paso</h2>
+            </div>
+            
+            <div id="solution-container" class="solution-content">
+                <div class="welcome-message">
+                    <i data-lucide="calculator" class="welcome-icon animate-pulse"></i>
+                    <h3>Ingresa una ecuación y haz clic en "Resolver" para ver el procedimiento matemático detallado</h3>
+                    <p>Soporta funciones algebraicas como <code>x^2</code>, exponenciales <code>exp(x)</code> o <code>e^x</code>, trigonométricas <code>sin(x)</code>, <code>cos(x)</code>, y más.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Numerical Solver Panel -->
+        <section class="panel glass-card numerical-panel">
+            <div class="panel-header header-with-actions">
+                <div class="header-title">
+                    <i data-lucide="table" class="icon-accent"></i>
+                    <h2>Solución Numérica (RK4 vs Euler)</h2>
+                </div>
+                <div class="table-controls">
+                    <div class="form-group-inline">
+                        <label for="input-step-h">Paso h:</label>
+                        <input type="number" id="input-step-h" class="small-input" value="0.1" min="0.001" max="1" step="0.05">
+                    </div>
+                    <div class="form-group-inline">
+                        <label for="input-steps-count">Iteraciones:</label>
+                        <input type="number" id="input-steps-count" class="small-input" value="10" min="1" max="100" step="5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="numerical-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Paso (n)</th>
+                            <th>xₙ</th>
+                            <th>yₙ (Euler)</th>
+                            <th>yₙ (RK4)</th>
+                            <th>Diferencia |RK4 - Euler|</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="empty-table-msg">Ingresa condiciones iniciales y calcula la ecuación para ver los datos numéricos.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <p>Hecho con ❤️ para estudiantes e ingenieros. AstroDiff v1.0.0</p>
+         </footer>
+    </div>
+
+    <!-- Paywall Modal Overlay -->
+    <div id="paywall-modal" class="modal-overlay">
+        <div class="modal-content glass-card paywall-card animate-scale-up">
+            <button class="modal-close" id="btn-close-paywall" title="Cerrar"><i data-lucide="x"></i></button>
+            <div class="modal-header-icon">
+                <div class="lock-circle">
+                    <i data-lucide="lock"></i>
+                </div>
+            </div>
+            <h2 class="modal-title">Unlock unlimited results</h2>
+            <p class="modal-subtitle">Choose a plan to reveal this calculation—and every future one.</p>
+            
+            <div class="expression-box">
+                <span class="expr-label">EXPRESSION</span>
+                <div class="expr-value" id="paywall-expression">y' + 2y = x</div>
+            </div>
+            
+            <div class="plans-container">
+                <div class="plan-option" id="plan-monthly">
+                    <div class="plan-select">
+                        <span class="radio-dot"></span>
+                    </div>
+                    <div class="plan-details">
+                        <span class="plan-name">MONTHLY</span>
+                        <span class="plan-price">$9.99<span class="price-period">/mo</span></span>
+                        <span class="plan-subtext">Billed every month</span>
+                    </div>
+                </div>
+                <div class="plan-option active" id="plan-yearly">
+                    <div class="best-value-badge">BEST VALUE</div>
+                    <div class="plan-select">
+                        <span class="radio-dot checked"><i data-lucide="check"></i></span>
+                    </div>
+                    <div class="plan-details">
+                        <span class="plan-name">YEARLY</span>
+                        <span class="plan-price">$49.99<span class="price-period">/yr</span></span>
+                        <span class="plan-subtext">Billed annually · ~$4.16/mo<br>Save $69.89/yr</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="features-list">
+                <span class="feature-item"><i data-lucide="check"></i> Instant reveal</span>
+                <span class="feature-item"><i data-lucide="check"></i> Full precision</span>
+                <span class="feature-item"><i data-lucide="check"></i> Cancel anytime</span>
+            </div>
+            
+            <button id="btn-continue-plan" class="btn btn-primary glowing-button paywall-btn">
+                Continue with Yearly →
+            </button>
+            
+            <button id="btn-maybe-later" class="btn-text">Maybe later</button>
+        </div>
+    </div>
+
+    <!-- Payment Modal Overlay (Simulated) -->
+    <div id="payment-modal" class="modal-overlay">
+        <div class="modal-content glass-card payment-card animate-scale-up">
+            <button class="modal-close" id="btn-close-payment" title="Cerrar"><i data-lucide="x"></i></button>
+            
+            <!-- Step 1: Form -->
+            <div id="payment-form-step">
+                <h2 class="modal-title">Confirmar Pago</h2>
+                
+                <div class="simulated-badge">
+                    <i data-lucide="shield-check"></i> Pago Seguro Encriptado (SSL)
+                </div>
+                
+                <div class="payment-form">
+                    <div class="form-group">
+                        <label>Titular de la Tarjeta</label>
+                        <div class="input-glow-wrapper">
+                            <input type="text" value="JOHN DOE" readonly class="mock-input">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Número de Tarjeta</label>
+                        <div class="input-glow-wrapper">
+                            <input type="text" value="4242 4242 4242 4242" readonly class="mock-input">
+                        </div>
+                    </div>
+                    
+                    <div class="payment-form-row">
+                        <div class="form-group">
+                            <label>Vencimiento</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" value="12/30" readonly class="mock-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" value="123" readonly class="mock-input">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="btn-submit-payment" class="btn btn-primary glowing-button payment-btn">
+                        Procesar Pago
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Processing -->
+            <div id="payment-processing-step" style="display: none;">
+                <div class="processing-container">
+                    <div class="spinner"></div>
+                    <h3>Procesando el pago...</h3>
+                    <p>Estableciendo conexión segura y verificando autorización...</p>
+                </div>
+            </div>
+            
+            <!-- Step 3: Success -->
+            <div id="payment-success-step" style="display: none;">
+                <div class="success-container">
+                    <div class="success-icon-circle animate-pulse">
+                        <i data-lucide="sparkles"></i>
+                    </div>
+                    <h3>¡Compra exitosa!</h3>
+                    <p>Tu cuenta ha sido actualizada a <strong>Premium</strong>. Se han desbloqueado todas las funciones de cálculo de AstroDiff.</p>
+                    <button id="btn-success-close" class="btn btn-primary glowing-button success-btn">
+                        Comenzar a Usar AstroDiff
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+</html>
